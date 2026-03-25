@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { navbarStyles } from '../assets/dummyStyles';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { SignedOut, SignedIn, UserButton, useClerk, SignOutButton } from '@clerk/clerk-react';
@@ -22,6 +22,40 @@ const Navbar = () => {
     const navRef = useRef(null);
     const clerk = useClerk();
     const navigate = useNavigate();
+    //hide and show navbar if the current scroll is greater than 80 then hide the navbar
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                setShowNavbar(false);
+            } else {
+                setShowNavbar(true);
+            }
+            setLastScrollY(currentScrollY);
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
+//if doctor is loggged in it will stored inside the local storage
+    useEffect(() => {
+        const onStorage = (e) => {
+            if (e.key === STORAGE_KEY) {
+                setIsDoctorLoggedIn(Boolean(e.newValue));
+            }
+        };
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
+    }, []);
+// close the toggle menu for the mobile when click outside the box
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isOpen && navRef.current && !navRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
 
     const navItems = [
         { label: "Home", href: "/" },
@@ -36,7 +70,7 @@ const Navbar = () => {
             {/* top border */}
             <div className={navbarStyles.navbarBorder}></div>
 
-            <nav
+            <nav ref={navRef}
                 className={`${navbarStyles.navbarContainer} ${showNavbar ? navbarStyles.navbarVisible : navbarStyles.navbarHidden
                     }`}
             >
@@ -138,7 +172,7 @@ const Navbar = () => {
                                 <Link to='/doctor-admin/login'
                                     className={navbarStyles.mobileDoctorAdminButton}
                                     onClick={() => setIsOpen(false)}>
-                                        Doctor Admin
+                                    Doctor Admin
                                 </Link>
                                 <div className={navbarStyles.mobileLoginContainer}>
                                     <button onClick={() => {
@@ -154,7 +188,6 @@ const Navbar = () => {
                     )}
                 </div>
                 <style>{navbarStyles.animationStyles}</style>
-
             </nav>
         </>
     );
