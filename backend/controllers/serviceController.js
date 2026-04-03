@@ -138,3 +138,96 @@ export async function getServiceById(req, res) {
         })
     }
 }
+
+// to update a service
+export async function updateService(req, res) {
+    try {
+        const { id } = req.params;
+        const existing = await Service.findById(id);
+        if (!existing) return res.status(404).json({
+            success: false,
+            message: "Service not found"
+        });
+        const b = req.body || {};
+        const updateData = {};
+        // to update each field if already present then update them
+        if (b.name !== undefined) updateData.name = b.name;
+        if (b.about !== undefined) updateData.about = b.about;
+        if (b.shortDescription !== undefined) updateData.shortDescription = b.shortDescription;
+        if (b.price !== undefined) updateData.price = sanitizePrice(b.price);
+        if (b.availability !== undefined) updateData.available = parseAvailability(b.availability);
+        if (b.instructions !== undefined) updateData.instructions = parseJsonArrayField(b.instructions);
+        if (b.slots !== undefined) updateData.slots = normalizeSlotsToMap(parseJsonArrayField(b.slots));
+
+        if (req.file) {
+            try {
+                const up = await uploadToCloudinary(req.file.path, "services");
+                if (up?.secure_url) {
+                    updateData.imageUrl = up.secure_url;
+                    updateData.imagePublicId = up.public_id || null;
+                    if (existing.imagePublicId) {
+                        // it will remove the old image and will update the new image
+                        try {
+                            await deleteFromCloudinary(existing.imagePublicId);
+                        } catch (err) {
+                            console.warn("Cloudinary delete failed:", err?.message || err);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Cloudinary upload error:", err);
+            }
+        }
+        const updated = await Service.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true
+        });
+        return res.status(200).json({
+            success: true,
+            data: updated,
+            message: "Service updated"
+        })
+    }
+    catch (error) {
+        console.error("UpdateService Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        })
+    }
+}
+
+// to delete a service 
+export async function deleteService(req, res) {
+    try {
+        const { id } = req.params;
+        const existing = await Service.findById(id);
+        if (!existing) return res.status(404).json({
+            success: false,
+            message: "Service not found"
+        });
+        if (existing.imagePublicId) {
+            try {
+                await deleteFromCloudinary(existing.imagePublicId);
+            }
+            catch (error) {
+                console.warn("Failed to delete image from cloudinary",
+                    error?.message || error
+
+                );
+            }
+        }
+        await existing.deleteOne();
+        return res.status(200).json({
+            success: true,
+            message: "Service Deleted."
+        })
+    }
+    catch (error) {
+        console.error("DeleteService Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        })
+    }
+}
