@@ -98,3 +98,20 @@ export async function createService(req, res) {
     }
 }
 
+// to get all the services
+export async function getServices(req, res) {
+    try {
+        const list = await Service.find().sort({ createdAt: -1 }).lean();
+        return res.status(200).json({
+            success: true,
+            data: list
+        });
+    }
+    catch (error) {
+        console.error("GetService Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        })
+    }
+}
