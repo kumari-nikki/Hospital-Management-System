@@ -1,7 +1,6 @@
 import Doctor from "../models/Doctor.js"
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt";
 
 //HELPER FUNCTIONS
 // this function will convert time 12hrs to number of minutes since midnight
@@ -85,17 +84,17 @@ export async function createDoctor(req, res) {
         if (req.file?.path) {
             const uploaded = await uploadToCloudinary(req.file.path, "doctors");
 
-            imageUrl = uploaded?.url || imageUrl;
-            imagePublicId = uploaded?.public_id || imagePublicId;
+            imageUrl = uploaded?.secure_url|| uploaded?.url||imageUrl;
+            imagePublicId = uploaded?.public_id || uploaded?.publicId || imagePublicId;
         }
 
-        const hashedPassword = await bcrypt.hash(body.password, 10);
+     //   const hashedPassword = await bcrypt.hash(body.password, 10);
 
         const schedule = parseScheduleInput(body.schedule);
 
         const doc = new Doctor({
             email: emailLC,
-            password: hashedPassword,
+            password: body.password,
             name: body.name,
             specialization: body.specialization || "",
             imageUrl,
@@ -240,9 +239,10 @@ export const getDoctors = async (req, res) => {
 
 // to get a particular doctor by id
 
-export async function getDoctorById(req, res)=> {
+export async function getDoctorById(req, res) {
     try {
         const { id } = req.params;
+
         const doc = await Doctor.findById(id).select("-password").lean();
         if (!doc) return res.status(404).json({
             success: false,
@@ -269,6 +269,7 @@ export async function updateDoctor(req, res) {
 
         const existing = await Doctor.findById(id);
         if (!existing) return res.status(404).json({ success: false, message: "Doctor not found" });
+
         // if exists then update the image else show a warning
 
         if (req.file?.path) {
@@ -297,7 +298,7 @@ export async function updateDoctor(req, res) {
         }
 
         if (body.password) {
-            existing.password = await bcrypt.hash(body.password, 10);
+            existing.password = body.password;
         }
 
         await existing.save();
@@ -336,7 +337,7 @@ export async function deleteDoctor(req, res) {
         })
     }
     catch (error) {
-        console.error("deleteDoctor error:", err);
+        console.error("deleteDoctor error:", error);
         return res.status(500).json({ success: false, message: "Server error" });
     }
 }
@@ -365,10 +366,12 @@ export async function toggleAvailability(req, res) {
     }
 }
 
+
 // to login the doctor
 export async function doctorLogin(req, res) {
     try {
         const { email, password } = req.body || {};
+      console.log("Login API hit");
         if (!email || !password) return res.status(400).json({
             success: false,
             message: "Email and Password are required"
@@ -387,6 +390,7 @@ export async function doctorLogin(req, res) {
             success: false,
             message: "Server Misconfigured"
         });
+        
 
         const token = jwt.sign(
             {
@@ -399,7 +403,7 @@ export async function doctorLogin(req, res) {
         );
         const out = doc.toObject();
         delete out.password;
-        return res.json({ success: true, token, data:out })
+        return res.json({ success: true, token, data: out })
     }
     catch (error) {
         console.error("Login error:", error);
