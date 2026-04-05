@@ -1,4 +1,4 @@
-import Service from "../models/Sevice.js";
+import Service from "../models/Service.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 // Helper function
 // so this function will converts array like input into a clean array
