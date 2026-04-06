@@ -7,8 +7,14 @@ import {connectDB } from './config/db.js'
 import doctorRouter from "./routes/doctorRoutes.js";
 import serviceRouter from "./routes/serviceRouter.js";
 import appointmentRouter from "./routes/appointmentRouter.js"
+import serviceAppointmentRouter from "./routes/serviceAppointmentRouter.js";
 const app=express()
 const port=4000;
+
+const allowedOrigins=[
+    
+]
+
 // middlewares
 app.use(cors())
 app.use(express.json({limit:"20mb"}));
@@ -17,12 +23,13 @@ app.use(clerkMiddleware());
 
 //DB
 connectDB()
+
 //Routes
 app.use("/api/doctors", doctorRouter)
-
 app.use("/api/services", serviceRouter)
-
 app.use("/api/appointments", appointmentRouter)
+app.use("/api/service-appointments", serviceAppointmentRouter)
+
 
 app.get('/',(req,res)=>{
     res.send("API Working")

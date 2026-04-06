@@ -119,7 +119,7 @@ const serviceAppointmentSchema = new mongoose.Schema({
         sessionId: {
             type: String, // stripe checkout sessionid
             default: "",
-            index: true,
+            
         },
 
         meta: {
