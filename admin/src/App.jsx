@@ -4,6 +4,7 @@ import Hero from './pages/Hero';
 import Home from './pages/Home'
 import { useUser } from '@clerk/react';
 import Add from './pages/Add';
+import { List } from 'lucide-react';
 
 
 
@@ -57,7 +58,54 @@ const App = () => {
           </RequireAuth>
         }
       />
-      
+      <Route
+        path="/list"
+        element={
+          <RequireAuth>
+            <List />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/appointments"
+        element={
+          <RequireAuth>
+            <Appointments />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/service-dashboard"
+        element={
+          <RequireAuth>
+            <SerDashboard />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/add-service"
+        element={
+          <RequireAuth>
+            <AddSer />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/list-service"
+        element={
+          <RequireAuth>
+            <ListService />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/service-appointments"
+        element={
+          <RequireAuth>
+            <ServiceAppointments />
+          </RequireAuth>
+        }
+      /> 
     </Routes>
   );
 };
