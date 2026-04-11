@@ -1,17 +1,24 @@
-import React from 'react'
-import { Routes, Route, Link } from "react-router-dom";
-import Hero from './pages/Hero';
-import Home from './pages/Home'
-import { useUser } from '@clerk/react';
-import Add from './pages/Add';
-import { List } from 'lucide-react';
 
+import React from "react";
+import { Routes, Route,Link } from "react-router-dom";
+import { useUser } from '@clerk/react';
+
+
+import Home from "./pages/Home";
+import Hero from './pages/Hero';
+import Add from "./pages/Add";
+import List from "./pages/List";
+import Appointments from './pages/Appointments'
+import SerDashboard from "./pages/SerDashboard";
+import AddSer from "./pages/AddSer";
+import ListService from "./pages/ListService";
+import ServiceAppointments from "./pages/ServiceAppointments";
 
 
 function RequireAuth({ children }) {
   const { isLoaded, isSignedIn } = useUser();
 
-  if (!isLoaded) return null; // prevent flicker
+  if (!isLoaded) return null; 
   if (!isSignedIn)
     return (
       <div className="min-h-screen font-mono flex items-center justify-center bg-linear-to-b from-emerald-50 via-green-50 to-emerald-100 px-4">

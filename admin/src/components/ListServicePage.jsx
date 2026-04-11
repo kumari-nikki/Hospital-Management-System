@@ -10,7 +10,7 @@ import {
   Calendar,
   Plus,
 } from "lucide-react";
-import { serviceListStyles as s } from "../../assets/dummyStyles";
+import { serviceListStyles as s } from "../assets/dummyStyles";
 
 export default function ListServicePage({ apiBase }) {
   const API_BASE = apiBase || "http://localhost:4000";
