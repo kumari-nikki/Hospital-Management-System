@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export const connectDB = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://nikkibellla66_db_user:xgdxVEf6YaVB67lz@cluster0.6p3wqyj.mongodb.net/HospitalManagementSystem?retryWrites=true&w=majority"
+    process.env.MONGODB_URL
     );
     console.log("Db is connected");
   } catch (err) {
