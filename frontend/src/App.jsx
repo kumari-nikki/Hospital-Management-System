@@ -7,7 +7,7 @@ import Service from './pages/Service'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
-import DHome from './pages/Login'
+import DHome from './pages/DHome'
 
 const App = () => {
   return (
