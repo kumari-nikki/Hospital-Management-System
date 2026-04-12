@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Doctors from './pages/Doctors'
@@ -16,8 +16,9 @@ import EditProfile from './doctor/EditProfile'
 
 // Lucide icon
 import { CircleChevronUp } from "lucide-react";
-import VerifyPaymentPage from "../VerifyPaymetPage";
-import VerifyServicePaymentPage from "../VerifyServicePaymentPage";
+import VerifyPaymentPage from '../VerifyPaymentPage'
+ import VerifyServicePaymentPage from "../VerifyServicePaymentPage";
+
 
 //Scroll To Top
 const ScrollToTop = () => {
